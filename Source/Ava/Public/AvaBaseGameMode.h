@@ -3,17 +3,14 @@
 #pragma once
 
 #include "GameFramework/GameMode.h"
-#include "AvaGameMode.generated.h"
+#include "AvaBaseGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AVA_API AAvaGameMode : public AGameMode
+class AVA_API AAvaBaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+			
 };
