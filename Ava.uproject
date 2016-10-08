@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{39AF49FB-4747-543B-985B-F4A0B0D239DB}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Ava",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
