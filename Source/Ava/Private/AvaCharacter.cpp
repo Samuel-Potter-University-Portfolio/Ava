@@ -7,18 +7,23 @@
 AAvaCharacter::AAvaCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	GetCapsuleComponent()->InitCapsuleSize(30.f, 80.0f);
-
+	
+	UCapsuleComponent* capsule = GetCapsuleComponent();
+	capsule->InitCapsuleSize(30.f, 80.0f);
 
 	camera_boom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	camera_boom->SocketOffset = FVector(0, 0, 80.0f);
-	camera_boom->SocketOffset = FVector(-100, 0, 0.0f);
+	camera_boom->SocketOffset = FVector(-30.0f, 0, 75.0f);
 	camera_boom->bUsePawnControlRotation = true;
 	camera_boom->SetupAttachment(RootComponent);
 
 	camera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
 	camera->SetupAttachment(camera_boom);
+
+	UCharacterMovementComponent* movement = GetCharacterMovement();
+	movement->GetNavAgentPropertiesRef().bCanCrouch = true;
+	movement->MaxWalkSpeed = 270.0f;
+	movement->MaxWalkSpeedCrouched = 115.0f;
+	movement->CrouchedHalfHeight = 50.0f;
 }
 
 void AAvaCharacter::BeginPlay()
@@ -104,10 +109,10 @@ void AAvaCharacter::InputEnd_Jump()
 void AAvaCharacter::InputStart_Crouch()
 {
 	if (!GetCharacterMovement()->IsFalling())
-		bIsCrouched = true;
+		Crouch();
 }
 
 void AAvaCharacter::InputEnd_Crouch()
 {
-	bIsCrouched = false;
+	UnCrouch();
 }
