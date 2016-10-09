@@ -29,4 +29,16 @@ public:
 	virtual void InputEnd_Jump();
 	virtual void InputStart_Crouch();
 	virtual void InputEnd_Crouch();
+
+	UFUNCTION(BlueprintPure, Category = "Ava|Player")
+	float GetUnitSpeed();
+	
+	UPROPERTY(EditAnywhere)
+	float max_camera_distance = 20;
+	UPROPERTY(EditAnywhere)
+	float min_camera_distance = 60;
+	UPROPERTY(EditAnywhere)
+	float camera_crouch_offset = -70;
+
+	float last_lerp_value = 0.0f;
 };

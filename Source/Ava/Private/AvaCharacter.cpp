@@ -34,7 +34,16 @@ void AAvaCharacter::BeginPlay()
 
 void AAvaCharacter::Tick( float DeltaTime )
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
+
+	const float unit_speed = GetUnitSpeed();
+	//Camera boom move
+	{
+		last_lerp_value = last_lerp_value * 0.93f + unit_speed * 0.07f;
+		const float offset = bIsCrouched ? camera_crouch_offset * last_lerp_value : 0;
+		const float distance = min_camera_distance * (1.0f - last_lerp_value) + max_camera_distance * last_lerp_value - offset;
+		camera_boom->SocketOffset = FVector(distance, 0, 65.0f);
+	}
 
 }
 
@@ -58,7 +67,7 @@ void AAvaCharacter::Input_MoveForward(float value)
 {
 	if (Controller && value)
 	{
-		FRotator rotation = Controller->GetControlRotation();
+		FRotator rotation = camera_boom->GetComponentRotation();
 
 		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
 			rotation.Pitch = 0.0f;
@@ -72,7 +81,7 @@ void AAvaCharacter::Input_MoveRight(float value)
 {
 	if (Controller && value)
 	{
-		const FRotator rotation = Controller->GetControlRotation();
+		const FRotator rotation = camera_boom->GetComponentRotation();
 		const FVector direction = FRotationMatrix(rotation).GetScaledAxis(EAxis::Y);
 
 		AddMovementInput(direction, value);
@@ -109,10 +118,21 @@ void AAvaCharacter::InputEnd_Jump()
 void AAvaCharacter::InputStart_Crouch()
 {
 	if (!GetCharacterMovement()->IsFalling())
-		Crouch();
+	{
+		if (!bIsCrouched)
+			Crouch();
+		else
+			UnCrouch();
+	}
 }
 
 void AAvaCharacter::InputEnd_Crouch()
 {
-	UnCrouch();
+	
+}
+
+float AAvaCharacter::GetUnitSpeed()
+{
+	const float max_speed = GetCharacterMovement()->GetMaxSpeed();
+	return max_speed ? GetVelocity().Size() / max_speed : 0;
 }
