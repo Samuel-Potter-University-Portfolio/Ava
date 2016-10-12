@@ -45,6 +45,20 @@ void AAvaCharacter::Tick( float DeltaTime )
 		camera_boom->SocketOffset = FVector(distance, 0, 65.0f);
 	}
 
+	//Smooth movement
+	if(frame_input_count)
+	{
+		frame_input_dir.Normalize();
+
+		movement_vector = turn_factor * frame_input_dir + movement_vector * (1.0f - turn_factor);
+		movement_vector.Normalize();
+
+		AddMovementInput(movement_vector, frame_input_factor / (float)frame_input_count);
+
+		frame_input_dir = FVector::ZeroVector;
+		frame_input_factor = 0;
+		frame_input_count = 0;
+	}
 }
 
 void AAvaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -71,9 +85,18 @@ void AAvaCharacter::Input_MoveForward(float value)
 
 		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
 			rotation.Pitch = 0.0f;
-
-		const FVector direction = FRotationMatrix(rotation).GetScaledAxis(EAxis::X);
-		AddMovementInput(direction, value);
+		
+		if (value < 0)
+		{
+			frame_input_dir -= FRotationMatrix(rotation).GetScaledAxis(EAxis::X);
+			frame_input_factor -= value;
+		}
+		else
+		{
+			frame_input_dir += FRotationMatrix(rotation).GetScaledAxis(EAxis::X);
+			frame_input_factor += value;
+		}
+		frame_input_count++;
 	}
 }
 
@@ -81,10 +104,22 @@ void AAvaCharacter::Input_MoveRight(float value)
 {
 	if (Controller && value)
 	{
-		const FRotator rotation = camera_boom->GetComponentRotation();
-		const FVector direction = FRotationMatrix(rotation).GetScaledAxis(EAxis::Y);
+		FRotator rotation = camera_boom->GetComponentRotation();
 
-		AddMovementInput(direction, value);
+		if (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling())
+			rotation.Pitch = 0.0f;
+		
+		if (value < 0)
+		{
+			frame_input_dir -= FRotationMatrix(rotation).GetScaledAxis(EAxis::Y);
+			frame_input_factor -= value;
+		}
+		else
+		{
+			frame_input_dir += FRotationMatrix(rotation).GetScaledAxis(EAxis::Y);
+			frame_input_factor += value;
+		}
+		frame_input_count++;
 	}
 }
 

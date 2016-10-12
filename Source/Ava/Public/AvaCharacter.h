@@ -9,9 +9,18 @@ UCLASS()
 class AVA_API AAvaCharacter : public ACharacter
 {
 	GENERATED_BODY()
+private:
+	FVector movement_vector;
+	FVector frame_input_dir;
+	float frame_input_factor;
+	int frame_input_count;
+
 protected:
 	UCameraComponent* camera;
 	USpringArmComponent* camera_boom;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float turn_factor = 0.2f;
 
 public:
 	AAvaCharacter();
